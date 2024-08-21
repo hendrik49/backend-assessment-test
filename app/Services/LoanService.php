@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Loan;
 use App\Models\ReceivedRepayment;
+use App\Models\ScheduledRepayment;
 use App\Models\User;
 
 class LoanService
@@ -29,6 +30,21 @@ class LoanService
         $loan->processed_at = $processedAt;
         $loan->status = Loan::STATUS_DUE;
         $loan->save();
+
+        $this->scheduleRepayments($loan);
+
+        return @$loan;
+    }
+
+    protected function scheduleRepayments(Loan $loan)
+    {
+        $repaymentAmount = $loan->amount / ($loan->term);
+
+        for ($i = 1; $i <= $loan->term; $i++) {
+            $repayment = new ScheduledRepayment();
+            $repayment->loan_id = $loan->id;
+            $repayment->save();
+        }
     }
 
     /**
@@ -46,10 +62,36 @@ class LoanService
         $loan->amount -= $repaymentAmount;
         $loan->save();
 
-        $repayment = new ReceivedRepayment();
-        $repayment->loan_id = $loanId;
-        $repayment->save();
+        $repayment = Loan::where('id', $loanId)
+            ->where('amount', '>', 0)
+            ->orderBy('created_at')
+            ->first();
+
+        if ($repayment) {
+            $repayment->save();
+        }
+
+        $this->checkLoanStatus($loan);
 
         return $repayment;
+    }
+
+    protected function checkLoanStatus(Loan $loan)
+    {
+        $remainingRepayment = Loan::where('id', $loan->id)
+            ->where('amount', '>', 0)
+            ->count();
+
+        if ($remainingRepayment == 0) {
+            // Mark loan as fully repaid or closed
+            $loan->status = 'repaid'; // or similar status
+            $loan->save();
+        }
+    }
+
+
+    public function getLoanDetails($loanId)
+    {
+        return Loan::with('repayments')->findOrFail($loanId);
     }
 }
