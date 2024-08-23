@@ -148,77 +148,77 @@ class LoanServiceTest extends TestCase
         ]);
     }
 
-    // public function testServiceCanRepayAScheduledRepaymentConsecutively()
-    // {
-    //     $loan = Loan::factory()->create([
-    //         'user_id' => $this->user->id,
-    //         'terms' => 3,
-    //         'amount' => 5000,
-    //         'currency_code' => Loan::CURRENCY_VND,
-    //         'processed_at' => '2020-01-20',
-    //     ]);
+    public function testServiceCanRepayAScheduledRepaymentConsecutively()
+    {
+        $loan = Loan::factory()->create([
+            'user_id' => $this->user->id,
+            'terms' => 3,
+            'amount' => 5000,
+            'currency_code' => Loan::CURRENCY_VND,
+            'processed_at' => '2020-01-20',
+        ]);
 
-    //     // First two scheduled repayments are already repaid
-    //     $scheduledRepaymentOne =  ScheduledRepayment::factory()->create([
-    //         'loan_id' => $loan->id,
-    //         'amount' => 1666,
-    //         'currency_code' => Loan::CURRENCY_VND,
-    //         'due_date' => '2020-02-20',
-    //         'status' => ScheduledRepayment::STATUS_REPAID,
-    //     ]);
-    //     $scheduledRepaymentTwo =  ScheduledRepayment::factory()->create([
-    //         'loan_id' => $loan->id,
-    //         'amount' => 1666,
-    //         'currency_code' => Loan::CURRENCY_VND,
-    //         'due_date' => '2020-03-20',
-    //         'status' => ScheduledRepayment::STATUS_REPAID,
-    //     ]);
-    //     // Only the last one is due
-    //     $scheduledRepaymentThree =  ScheduledRepayment::factory()->create([
-    //         'loan_id' => $loan->id,
-    //         'amount' => 1667,
-    //         'currency_code' => Loan::CURRENCY_VND,
-    //         'due_date' => '2020-04-20',
-    //         'status' => ScheduledRepayment::STATUS_DUE,
-    //     ]);
+        // First two scheduled repayments are already repaid
+        $scheduledRepaymentOne =  ScheduledRepayment::factory()->create([
+            'loan_id' => $loan->id,
+            'amount' => 1666,
+            'currency_code' => Loan::CURRENCY_VND,
+            'due_date' => '2020-02-20',
+            'status' => ScheduledRepayment::STATUS_REPAID,
+        ]);
+        $scheduledRepaymentTwo =  ScheduledRepayment::factory()->create([
+            'loan_id' => $loan->id,
+            'amount' => 1666,
+            'currency_code' => Loan::CURRENCY_VND,
+            'due_date' => '2020-03-20',
+            'status' => ScheduledRepayment::STATUS_REPAID,
+        ]);
+        // Only the last one is due
+        $scheduledRepaymentThree =  ScheduledRepayment::factory()->create([
+            'loan_id' => $loan->id,
+            'amount' => 1668,
+            'currency_code' => Loan::CURRENCY_VND,
+            'due_date' => '2020-04-20',
+            'status' => ScheduledRepayment::STATUS_DUE,
+        ]);
 
-    //     $receivedRepayment = 1667;
-    //     $currencyCode = Loan::CURRENCY_VND;
-    //     $receivedAt = '2020-04-20';
+        $receivedRepayment = 1668;
+        $currencyCode = Loan::CURRENCY_VND;
+        $receivedAt = '2020-04-20';
 
-    //     // Repaying the last one
-    //     $loan = $this->loanService->repayLoan($loan, $receivedRepayment, $currencyCode, $receivedAt);
+        // Repaying the last one
+        $loan = $this->loanService->repayLoan($loan, $receivedRepayment, $currencyCode, $receivedAt);
 
-    //     // Asserting Loan values
-    //     $this->assertDatabaseHas('loans', [
-    //         'id' => $loan->id,
-    //         'user_id' => $this->user->id,
-    //         'amount' => 5000,
-    //         'outstanding_amount' => 0,
-    //         'currency_code' => $currencyCode,
-    //         'status' => Loan::STATUS_REPAID,
-    //         'processed_at' => '2020-01-20',
-    //     ]);
+        // Asserting Loan values
+        $this->assertDatabaseHas('loans', [
+            'id' => $loan->id,
+            'user_id' => $this->user->id,
+            'amount' => 5000,
+            'outstanding_amount' => 0,
+            'currency_code' => $currencyCode,
+            'status' => Loan::STATUS_REPAID,
+            'processed_at' => '2020-01-20',
+        ]);
 
-    //     // Asserting Last Scheduled Repayment is Repaid
-    //     $this->assertDatabaseHas('scheduled_repayments', [
-    //         'id' => $scheduledRepaymentThree->id,
-    //         'loan_id' => $loan->id,
-    //         'amount' => 1667,
-    //         'outstanding_amount' => 0,
-    //         'currency_code' => $currencyCode,
-    //         'due_date' => '2020-02-20',
-    //         'status' => ScheduledRepayment::STATUS_REPAID,
-    //     ]);
+        // Asserting Last Scheduled Repayment is Repaid
+        $this->assertDatabaseHas('scheduled_repayments', [
+            'id' => $scheduledRepaymentThree->id,
+            'loan_id' => $loan->id,
+            'amount' => 1668,
+            'outstanding_amount' => 0,
+            'currency_code' => $currencyCode,
+            'due_date' => '2020-04-20',
+            'status' => ScheduledRepayment::STATUS_REPAID,
+        ]);
 
-    //     // Asserting Received Repayment
-    //     $this->assertDatabaseHas('received_repayments', [
-    //         'loan_id' => $loan->id,
-    //         'amount' => 1667,
-    //         'currency_code' => $currencyCode,
-    //         'received_at' => '2020-04-20',
-    //     ]);
-    // }
+        // Asserting Received Repayment
+        $this->assertDatabaseHas('received_repayments', [
+            'loan_id' => $loan->id,
+            'amount' => 1668,
+            'currency_code' => $currencyCode,
+            'received_at' => '2020-04-20',
+        ]);
+    }
 
     // public function testServiceCanRepayMultipleScheduledRepayments()
     // {

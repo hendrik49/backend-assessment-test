@@ -101,8 +101,18 @@ class LoanService
             throw new \Exception('Repayment amount must be greater than zero');
         }
 
+        //Update ScheduledRepayment
+        $repay = ScheduledRepayment::where('loan_id', $loan->id)->where('due_date', $receivedAt)->first();
+        
+        $repay->update([
+            'outstanding_amount' => 0,
+            'status' => 'repaid'
+        ]);
+
+        $amount2 = ScheduledRepayment::where('loan_id', $loan->id)->where('status','repaid')->sum('amount');
+
         // Calculate new outstanding amount
-        $newOutstandingAmount = $loan->amount - $amount;
+        $newOutstandingAmount = $loan->amount - $amount2;
 
         // Update loan status if fully repaid
         $status = $newOutstandingAmount <= 0 ? 'repaid' : 'due';
@@ -111,11 +121,6 @@ class LoanService
         $loan->update([
             'outstanding_amount' => max($newOutstandingAmount, 0),
             'status' => $status
-        ]);
-
-        ScheduledRepayment::where('loan_id', $loan->id)->first()->update([
-            'outstanding_amount' => 0,
-            'status' => 'repaid'
         ]);
         
         // Record the repayment
