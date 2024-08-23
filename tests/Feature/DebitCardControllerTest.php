@@ -75,13 +75,18 @@ class DebitCardControllerTest extends TestCase
 
         $response->assertStatus(200)
                 ->assertJsonFragment(['id' => $debitCard->id]);
-                
+
     }
 
     public function testCustomerCannotSeeASingleDebitCardDetails()
     {
         // get api/debit-cards/{debitCard}
+        $otherUser = User::factory()->create();
+        $debitCard = DebitCard::factory()->create(['user_id' => $otherUser->id]);
 
+        $response = $this->getJson('/api/debit-cards/' . $debitCard->id);
+
+        $response->assertStatus(403); // Forbidden response
     }
 
     public function testCustomerCanActivateADebitCard()
