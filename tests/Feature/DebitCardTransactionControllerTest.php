@@ -62,7 +62,7 @@ class DebitCardTransactionControllerTest extends TestCase
         ]);
 
         // Optionally assert the count of transactions if needed
-        $response->assertJsonCount(2, 'data'); // Adjust the path if your response format is different
+        $response->assertJsonCount(2); // Adjust the path if your response format is different
     
     }
 
