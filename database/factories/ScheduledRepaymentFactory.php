@@ -24,10 +24,10 @@ class ScheduledRepaymentFactory extends Factory
     {
         return [
             'loan_id' => Loan::factory(), // Creates a related Loan record if needed
-            'due_date' => $this->faker->dateBetween('+1 month', '+6 months'),
+            'due_date' => $this->faker->dateTimeBetween('+1 month', '+6 months'),
             'amount' => $this->faker->numberBetween(50, 500), // Adjust the range as needed
             'currency_code' => $this->faker->currencyCode(),
-            'status' => $this->faker->randomElement(['pending', 'paid']), // Adjust statuses as needed
+            'status' => $this->faker->randomElement(['due']), // Adjust statuses as needed
       
         ];
     }

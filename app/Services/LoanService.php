@@ -102,24 +102,29 @@ class LoanService
         }
 
         // Calculate new outstanding amount
-        $newOutstandingAmount = $loan->outstanding_amount - $amount;
+        $newOutstandingAmount = $loan->amount - $amount;
 
         // Update loan status if fully repaid
-        $status = $newOutstandingAmount <= 0 ? 'repaid' : $loan->status;
+        $status = $newOutstandingAmount <= 0 ? 'repaid' : 'due';
 
         // Update loan
         $loan->update([
             'outstanding_amount' => max($newOutstandingAmount, 0),
-            'status' => $status,
-            'processed_at' => Carbon::parse($receivedAt),
+            'status' => $status
         ]);
 
+        ScheduledRepayment::where('loan_id', $loan->id)->first()->update([
+            'outstanding_amount' => 0,
+            'status' => 'repaid'
+        ]);
+        
         // Record the repayment
-        return ReceivedRepayment::create([
+       return ReceivedRepayment::create([
             'loan_id' => $loan->id,
             'amount' => $amount,
             'currency_code' => $currencyCode,
             'received_at' => $receivedAt,
+            'status' => ScheduledRepayment::STATUS_REPAID
         ]);
     }
 

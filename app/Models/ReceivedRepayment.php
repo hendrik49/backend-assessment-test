@@ -26,7 +26,8 @@ class ReceivedRepayment extends Model
         'loan_id',
         'amount',
         'currency_code',
-        'received_at'
+        'received_at',
+        'status'
     ];
 
     protected $casts = [
