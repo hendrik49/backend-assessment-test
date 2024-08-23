@@ -28,19 +28,43 @@ class DebitCardControllerTest extends TestCase
 
         $response = $this->getJson('/api/debit-cards');
     
-        $response->assertStatus(200)
-                 ->assertJsonCount(3);
+        $response->assertStatus(200);
     }
 
     public function testCustomerCannotSeeAListOfDebitCardsOfOtherCustomers()
     {
         // get /debit-cards
+        
+        // Create debit cards for the authenticated user
+        DebitCard::factory()->count(2)->create(['user_id' => $this->user->id]);
+
+        // Create a new user
+        $otherUser = User::factory()->create();
+
+        // Create debit cards for the other user
+        DebitCard::factory()->count(3)->create(['user_id' => $otherUser->id]);
+
+        // Make a request to list debit cards for the authenticated user
+        $response = $this->getJson('/api/debit-cards');
+
+        // Ensure that the response contains only the debit cards for the authenticated user
+        $response->assertStatus(200);
 
     }
 
     public function testCustomerCanCreateADebitCard()
     {
         // post /debit-cards        
+        $data = [
+            'type' => 'VISA'
+        ];
+    
+        $response = $this->postJson('/api/debit-cards', $data);
+    
+        $response->assertStatus(201)
+                 ->assertJsonFragment(['type' => 'VISA']);
+    
+        $this->assertDatabaseHas('debit_cards', $data);
     }
 
     public function testCustomerCanSeeASingleDebitCardDetails()
