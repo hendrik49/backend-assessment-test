@@ -32,6 +32,9 @@ class ReceivedRepayment extends Model
     protected $casts = [
         'amount' => 'decimal:0',
         'due_date' => 'date',
+        'created_at',
+        'updated_at',
+        'deleted_at'
     ];
 
     protected $hidden = [
