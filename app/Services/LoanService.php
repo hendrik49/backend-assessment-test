@@ -137,6 +137,7 @@ class LoanService
             ScheduledRepayment::create([
                 'loan_id' => $loan->id,
                 'due_date' => $date,
+                'amount' => $loan->amount,
                 'outstanding_amount' => $loan->amount / $loan->terms,
                 'currency_code' => $loan->currency_code,
                 'status' => ScheduledRepayment::STATUS_DUE
