@@ -125,20 +125,24 @@ class LoanService
 
     public function scheduleRepayments(Loan $loan): void
     {
-        $now = Carbon::now();
+        $now = Carbon::createFromFormat('Y-m-d',$loan->processed_at);
         $repaymentDates = [];
 
         for ($i = 1; $i <= $loan->terms; $i++) {
-            $repaymentDates[] = $now->copy()->addMonths($i)->startOfMonth();
+            $repaymentDates[] = $now->copy()->addMonths($i)->toDateString();
         }
 
-        foreach ($repaymentDates as $date) {
+        foreach ($repaymentDates as $key => $date) {
             // Assuming you have a ScheduledRepayment model
+            $amount = intval($loan->amount / $loan->terms);
+            $sumamount = $amount + $amount;
+            $key = $key + 1;
+
             ScheduledRepayment::create([
                 'loan_id' => $loan->id,
                 'due_date' => $date,
-                'amount' => $loan->amount,
-                'outstanding_amount' => $loan->amount / $loan->terms,
+                'amount' => $key ==  $loan->terms? ($loan->amount - $sumamount) : $amount,
+                'outstanding_amount' => $key ==  $loan->terms? ($loan->amount - $sumamount)  : $amount,
                 'currency_code' => $loan->currency_code,
                 'status' => ScheduledRepayment::STATUS_DUE
             ]);

@@ -37,8 +37,7 @@ class ScheduledRepayment extends Model
 
     protected $casts = [
         'amount' => 'decimal:0',
-        'outstanding_amount' => 'decimal:0',
-        'due_date' => 'date',
+        'outstanding_amount' => 'decimal:0'
     ];
 
     protected $hidden = [
@@ -56,5 +55,10 @@ class ScheduledRepayment extends Model
     public function loan()
     {
         return $this->belongsTo(Loan::class, 'loan_id');
+    }
+
+    public function getDueDateAttribute($value)
+    {
+        return \Carbon\Carbon::parse($value)->format('Y-m-d'); // Format as YYYY-MM-DD
     }
 }
