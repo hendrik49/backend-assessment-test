@@ -129,6 +129,13 @@ class DebitCardControllerTest extends TestCase
     public function testCustomerCannotUpdateADebitCardWithWrongValidation()
     {
         // put api/debit-cards/{debitCard}
+        $debitCard = DebitCard::factory()->create(['user_id' => $this->user->id]);
+
+        $response = $this->putJson('/api/debit-cards/' . $debitCard->id, [
+            'is_active' => Carbon::now() // Invalid data
+        ]);
+
+        $response->assertStatus(422); // Unprocessable Entity
            
     }
 
