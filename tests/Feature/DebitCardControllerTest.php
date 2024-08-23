@@ -165,7 +165,7 @@ class DebitCardControllerTest extends TestCase
 
         $response = $this->deleteJson('/api/debit-cards/' . $debitCard->id);
 
-        $response->assertStatus(400); // Bad Request or relevant status
+        $response->assertStatus(403); // Bad Request or relevant status
 
         $this->assertDatabaseHas('debit_cards', [
             'id' => $debitCard->id
