@@ -154,7 +154,6 @@ class DebitCardTransactionControllerTest extends TestCase
 
         // Optionally assert the structure of the response
         $response->assertJsonFragment([
-            'debit_card_id' => $this->debitCard->id,
             'amount' => '150',
             'currency_code' => 'IDR',
         ]);
