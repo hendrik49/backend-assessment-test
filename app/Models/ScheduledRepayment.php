@@ -29,13 +29,13 @@ class ScheduledRepayment extends Model
     protected $fillable = [
         'loan_id',
         'due_date',
-        'amount',
+        'outstanding_amount',
         'currency_code',
         'status'
     ];
 
     protected $casts = [
-        'amount' => 'decimal:0',
+        'outstanding_amount' => 'decimal:0',
         'due_date' => 'date',
     ];
 
