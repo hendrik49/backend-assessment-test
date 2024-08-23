@@ -75,6 +75,7 @@ class DebitCardControllerTest extends TestCase
 
         $response->assertStatus(200)
                 ->assertJsonFragment(['id' => $debitCard->id]);
+                
     }
 
     public function testCustomerCannotSeeASingleDebitCardDetails()
