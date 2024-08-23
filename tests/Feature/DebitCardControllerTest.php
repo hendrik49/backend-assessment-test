@@ -123,7 +123,7 @@ class DebitCardControllerTest extends TestCase
         $this->assertDatabaseHas('debit_cards', [
             'id' => $debitCard->id,
             'disabled_at' => Carbon::now()
-        ]);        
+        ]);         
     }
 
     public function testCustomerCannotUpdateADebitCardWithWrongValidation()
