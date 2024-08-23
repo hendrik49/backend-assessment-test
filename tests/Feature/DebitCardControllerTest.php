@@ -59,8 +59,7 @@ class DebitCardControllerTest extends TestCase
             'type' => 'VISA'
         ];
     
-        $response = $this->postJson('/api/debit-cards', $data);
-    
+        $response = $this->postJson('/api/debit-cards', $data);    
         $response->assertStatus(201)
                  ->assertJsonFragment(['type' => 'VISA']);
     
