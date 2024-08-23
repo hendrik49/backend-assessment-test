@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\ScheduledRepayment;
+use App\Models\Loan;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ScheduledRepaymentFactory extends Factory
@@ -22,7 +23,12 @@ class ScheduledRepaymentFactory extends Factory
     public function definition(): array
     {
         return [
-            // TODO: Complete factory
+            'loan_id' => Loan::factory(), // Creates a related Loan record if needed
+            'due_date' => $this->faker->dateBetween('+1 month', '+6 months'),
+            'amount' => $this->faker->numberBetween(50, 500), // Adjust the range as needed
+            'currency_code' => $this->faker->currencyCode(),
+            'status' => $this->faker->randomElement(['pending', 'paid']), // Adjust statuses as needed
+      
         ];
     }
 }

@@ -30,7 +30,8 @@ class ScheduledRepayment extends Model
         'loan_id',
         'due_date',
         'amount',
-        'currency_code'
+        'currency_code',
+        'status'
     ];
 
     /**
