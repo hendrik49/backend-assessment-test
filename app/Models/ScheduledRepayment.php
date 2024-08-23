@@ -34,6 +34,15 @@ class ScheduledRepayment extends Model
         'status'
     ];
 
+    protected $casts = [
+        'amount' => 'decimal:0',
+        'due_date' => 'date',
+    ];
+
+    protected $hidden = [
+        'id',
+    ];
+
     /**
      * A Scheduled Repayment belongs to a Loan
      *
