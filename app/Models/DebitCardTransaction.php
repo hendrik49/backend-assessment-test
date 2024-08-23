@@ -45,6 +45,10 @@ class DebitCardTransaction extends Authenticatable
         'currency_code',
     ];
 
+    protected $casts = [
+        'amount' => 'decimal:0'
+    ];
+
     /**
      * A Debit card transaction belongs to a Debit card
      *
