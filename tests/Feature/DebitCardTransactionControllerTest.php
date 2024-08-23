@@ -162,6 +162,36 @@ class DebitCardTransactionControllerTest extends TestCase
     public function testCustomerCannotCreateADebitCardTransactionToOtherCustomerDebitCard()
     {
         // post /debit-card-transactions
+        $this->debitCard = DebitCard::factory()->create([
+            'user_id' => $this->user->id
+        ]);
+
+        // Create another user
+        $this->otherUser = User::factory()->create();
+
+        // Create a debit card for the other user
+        $this->otherDebitCard = DebitCard::factory()->create([
+            'user_id' => $this->otherUser->id
+        ]);
+
+        $transactionData = [
+            'debit_card_id' => $this->otherDebitCard->id,
+            'amount' => 150,
+            'currency_code' => 'IDR',
+        ];
+
+        // Make a POST request to create a new debit card transaction
+        $response = $this->json('POST', '/api/debit-card-transactions', $transactionData);
+
+        // Assert that the response status is forbidden (403)
+        $response->assertStatus(403);
+
+        // Optionally, confirm that no transaction was created
+        $this->assertDatabaseMissing('debit_card_transactions', [
+            'debit_card_id' => $this->otherDebitCard->id,
+            'amount' => 150,
+            'currency_code' => 'IDR',
+        ]);
     }
 
     public function testCustomerCanSeeADebitCardTransaction()
