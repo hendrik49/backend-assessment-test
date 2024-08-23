@@ -15,6 +15,8 @@ class DebitCardTransactionControllerTest extends TestCase
 
     protected User $user;
     protected DebitCard $debitCard;
+    protected User $otherUser;
+    protected DebitCard $otherDebitCard;
 
     protected function setUp(): void
     {
@@ -69,6 +71,58 @@ class DebitCardTransactionControllerTest extends TestCase
     public function testCustomerCannotSeeAListOfDebitCardTransactionsOfOtherCustomerDebitCard()
     {
         // get /debit-card-transactions
+
+        // Create a debit card for the authenticated user
+        $this->debitCard = DebitCard::factory()->create([
+            'user_id' => $this->user->id
+        ]);
+
+        // Create transactions for the authenticated user's debit card
+        DebitCardTransaction::factory()->create([
+            'debit_card_id' => $this->debitCard->id,
+            'amount' => 100,
+            'currency_code' => 'IDR',
+        ]);
+
+        DebitCardTransaction::factory()->create([
+            'debit_card_id' => $this->debitCard->id,
+            'amount' => 200,
+            'currency_code' => 'IDR',
+        ]);
+
+        // Create another user
+        $this->otherUser = User::factory()->create();
+
+        // Create a debit card for the other user
+        $this->otherDebitCard = DebitCard::factory()->create([
+            'user_id' => $this->otherUser->id
+        ]);
+
+        // Create transactions for the other user's debit card
+        DebitCardTransaction::factory()->create([
+            'debit_card_id' => $this->otherDebitCard->id,
+            'amount' => 300,
+            'currency_code' => 'IDR',
+        ]);
+
+        DebitCardTransaction::factory()->create([
+            'debit_card_id' => $this->otherDebitCard->id,
+            'amount' => 400,
+            'currency_code' => 'IDR',
+        ]);
+
+        $response = $this->json('GET', '/api/debit-card-transactions',[
+            'debit_card_id' => $this->otherDebitCard->id
+        ]);
+
+        // Assert that the response status is OK
+        $response->assertStatus(403);
+
+        // Assert that the transactions of the other user's debit card are not included
+        $response->assertJson([
+            'message' => 'This action is unauthorized.'
+        ]);
+   
     }
 
     public function testCustomerCanCreateADebitCardTransaction()
