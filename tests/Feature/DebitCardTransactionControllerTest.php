@@ -128,6 +128,36 @@ class DebitCardTransactionControllerTest extends TestCase
     public function testCustomerCanCreateADebitCardTransaction()
     {
         // post /debit-card-transactions
+        
+        // Data for the new transaction
+        $transactionData = [
+            'debit_card_id' => $this->debitCard->id,
+            'amount' => 150,
+            'currency_code' => 'IDR',
+        ];
+
+        // Make a POST request to create a new debit card transaction
+        $response = $this->json('POST', '/api/debit-card-transactions', $transactionData);
+
+        // Assert that the response status is OK
+        $response->assertStatus(201);
+
+        // Get the JSON response data
+        $responseData = $response->json();
+
+        // Assert that the transaction was created successfully
+        $this->assertDatabaseHas('debit_card_transactions', [
+            'debit_card_id' => $this->debitCard->id,
+            'amount' => 150,
+            'currency_code' => 'IDR',
+        ]);
+
+        // Optionally assert the structure of the response
+        $response->assertJsonFragment([
+            'debit_card_id' => $this->debitCard->id,
+            'amount' => '150',
+            'currency_code' => 'IDR',
+        ]);
     }
 
     public function testCustomerCannotCreateADebitCardTransactionToOtherCustomerDebitCard()
