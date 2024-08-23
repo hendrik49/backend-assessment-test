@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\DebitCard;
+use App\Models\DebitCardTransaction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
@@ -157,7 +158,18 @@ class DebitCardControllerTest extends TestCase
     public function testCustomerCannotDeleteADebitCardWithTransaction()
     {
         // delete api/debit-cards/{debitCard}
-        
+        $debitCard = DebitCard::factory()->create(['user_id' => $this->user->id]);
+
+        // Create a transaction linked to the debit card (assume DebitCardTransaction model exists)
+        DebitCardTransaction::factory()->create(['debit_card_id' => $debitCard->id]);
+
+        $response = $this->deleteJson('/api/debit-cards/' . $debitCard->id);
+
+        $response->assertStatus(400); // Bad Request or relevant status
+
+        $this->assertDatabaseHas('debit_cards', [
+            'id' => $debitCard->id
+        ]);
     }
 
     // Extra bonus for extra tests :)
